@@ -30,6 +30,7 @@ async function run() {
     );
     const database = client.db('movieDB');
     const movieCollection = database.collection('movie');
+    const favoriteCollection = database.collection('favorite-movie');
     app.post('/movie', async (req, res) => {
       const movie = req.body;
       const result = await movieCollection.insertOne(movie);
@@ -53,6 +54,34 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await movieCollection.deleteOne(query);
+      res.send(result);
+    });
+    //post favorite movie
+    app.post('/favorite-movie/add-favorite', async (req, res) => {
+      const { movieDetails } = req.body;
+      if (!movieDetails.email) {
+        return res
+          .status(400)
+          .send({ error: 'Email is required to add a favorite movie.' });
+      }
+
+      const result = await favoriteCollection.insertOne({
+        movieDetails,
+      });
+
+      res.send(result);
+    });
+    app.get('/favorite-movie/add-favorite', async (req, res) => {
+      const cursor = favoriteCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+    //favorite delete
+    app.delete('/favorite/:id', async (req, res) => {
+      console.log('going to delete', req.params.id);
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await favoriteCollection.deleteOne(query);
       res.send(result);
     });
   } finally {
