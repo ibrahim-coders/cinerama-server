@@ -56,6 +56,18 @@ async function run() {
       const result = await movieCollection.deleteOne(query);
       res.send(result);
     });
+    //update movie
+    app.patch('/movie/:id', async (req, res) => {
+      const id = req.params.id;
+      const updateFields = req.body;
+      const filter = { _id: new ObjectId(id) };
+      const updateMovie = {
+        $set: updateFields,
+      };
+      const result = await movieCollection.updateOne(filter, updateMovie);
+      res.send(result);
+    });
+
     //post favorite movie
     app.post('/favorite-movie/add-favorite', async (req, res) => {
       const { movieDetails } = req.body;
@@ -71,14 +83,18 @@ async function run() {
 
       res.send(result);
     });
+
+    //get
+
     app.get('/favorite-movie/add-favorite', async (req, res) => {
       const cursor = favoriteCollection.find();
       const result = await cursor.toArray();
       res.send(result);
     });
+
     //favorite delete
-    app.delete('/favorite/:id', async (req, res) => {
-      console.log('going to delete', req.params.id);
+    app.delete('/favorite-movie/add-favorite/:id', async (req, res) => {
+      console.log(' delete', req.params.id);
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await favoriteCollection.deleteOne(query);
